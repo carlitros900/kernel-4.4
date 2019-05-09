@@ -1254,13 +1254,13 @@ static int gf_remove(struct spi_device *spi)
 
 
 	/* make sure ops on existing fds can abort cleanly */
-	if (gf_dev->spi->irq)
+	if (gf_dev->spi->irq) {
 		free_irq(gf_dev->spi->irq, gf_dev);
-
-	if (gf_dev->input != NULL)
-		input_unregister_device(gf_dev->input);
-		input_free_device(gf_dev->input);
-
+    }
+	        if (gf_dev->input != NULL) {
+		        input_unregister_device(gf_dev->input);
+		        input_free_device(gf_dev->input);
+            }
 	/* prevent new opens */
 	mutex_lock(&device_list_lock);
 	list_del(&gf_dev->device_entry);

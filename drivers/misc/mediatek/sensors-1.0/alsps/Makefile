@@ -16,6 +16,7 @@ obj-y   +=  alsps.o
 endif
 obj-y   +=  alsps_factory.o
 obj-y   +=  aal_control.o
+obj-y   +=  stk3x1x-new/
 # Vanzo:yucheng on: Sat, 15 Oct 2016 12:50:45 +0800
 project_name:=$(shell echo $(VANZO_INNER_PROJECT_NAME))
  

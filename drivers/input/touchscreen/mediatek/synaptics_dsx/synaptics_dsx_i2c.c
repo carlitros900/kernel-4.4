@@ -45,7 +45,8 @@
 #include <linux/device.h>
 #include <linux/fs.h>
 
-#include <mtk_gpio.h>
+#include "mtk_gpio.h"
+
 //#include "cust_gpio_usage.h"
 #include <asm/uaccess.h>
 
@@ -53,12 +54,7 @@
 #include "synaptics_dsx_i2c.h"
 #include "synaptics_dsx.h"
 #include "tpd_custom_synaptics.h"
-#include <mtk_boot_common.h>
-
-//============== 20161019
-#include <linux/irq.h>
-#include "../kernel/irq/internals.h"
-//==============
+#include "mtk_boot_common.h"
 
 #ifdef CONFIG_OF_TOUCH
 #include <linux/regulator/consumer.h>
@@ -81,7 +77,7 @@
 #define INPUT_PHYS_NAME "synaptics_dsx_i2c/input0"
 
 #ifdef KERNEL_ABOVE_2_6_38
-//#define TYPE_B_PROTOCOL
+#define TYPE_B_PROTOCOL
 #endif
 
 #define UBL_I2C_ADDR 0x2c
