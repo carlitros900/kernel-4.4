@@ -21,9 +21,7 @@
 #include <linux/list.h>
 #include <linux/i2c.h>
 #include <linux/i2c-dev.h>
-#if !defined(CONFIG_ARCH_MT8167)
 #include <linux/irq.h>
-#endif
 #include <linux/uaccess.h>
 #include <linux/interrupt.h>
 #include <linux/io.h>
@@ -235,7 +233,7 @@ LCM_STATUS lcm_i2c_set_data(char type, const LCM_DATA_T2 *t2)
 	unsigned int ret_code = 0;
 
 	/* check parameter is valid */
-	if (LCM_STATUS_OK == _lcm_i2c_check_data(type, t2)) {
+	if (_lcm_i2c_check_data(type, t2) == LCM_STATUS_OK) {
 		switch (type) {
 		case LCM_I2C_WRITE:
 			pr_debug("[LCM][I2C] %s/%d: %d, 0x%x, 0x%x\n", __func__, __LINE__, type,

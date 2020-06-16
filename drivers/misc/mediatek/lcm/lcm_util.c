@@ -64,6 +64,8 @@ static LCM_STATUS _lcm_util_check_write_cmd_v2(const LCM_DATA_T3 *t3)
 {
 	if (t3 == NULL)
 		return LCM_STATUS_ERROR;
+	if ((t3->size > 0) && (t3->data == NULL))
+		return LCM_STATUS_ERROR;
 
 	return LCM_STATUS_OK;
 }
@@ -90,7 +92,7 @@ static LCM_STATUS _lcm_util_check_read_cmd_v2(const LCM_DATA_T4 *t4)
 LCM_STATUS lcm_util_set_data(const LCM_UTIL_FUNCS *lcm_util, char type, LCM_DATA_T1 *t1)
 {
 	/* check parameter is valid */
-	if (LCM_STATUS_OK == _lcm_util_check_data(type, t1)) {
+	if (_lcm_util_check_data(type, t1) == LCM_STATUS_OK) {
 		switch (type) {
 		case LCM_UTIL_RESET:
 			lcm_util->set_reset_pin((unsigned int)t1->data);
@@ -128,7 +130,7 @@ LCM_STATUS lcm_util_set_write_cmd_v1(const LCM_UTIL_FUNCS *lcm_util, LCM_DATA_T5
 	unsigned int cmd[32];
 
 	/* check parameter is valid */
-	if (LCM_STATUS_OK == _lcm_util_check_write_cmd_v1(t5)) {
+	if (_lcm_util_check_write_cmd_v1(t5) == LCM_STATUS_OK) {
 		memset(cmd, 0x0, sizeof(unsigned int) * 32);
 		for (i = 0; i < t5->size; i++)
 			cmd[i] = (t5->cmd[i * 4 + 3] << 24)
@@ -144,12 +146,39 @@ LCM_STATUS lcm_util_set_write_cmd_v1(const LCM_UTIL_FUNCS *lcm_util, LCM_DATA_T5
 	return LCM_STATUS_OK;
 }
 
+LCM_STATUS lcm_util_set_write_cmd_v11(const LCM_UTIL_FUNCS *lcm_util, LCM_DATA_T5 *t5,
+					unsigned char force_update, void *cmdq)
+{
+	unsigned int i;
+	unsigned int cmd[32];
+
+	if (lcm_util->dsi_set_cmdq_V11 == NULL)
+		return LCM_STATUS_OK;
+
+	/* check parameter is valid */
+	if (_lcm_util_check_write_cmd_v1(t5) == LCM_STATUS_OK) {
+		memset(cmd, 0x0, sizeof(unsigned int) * 32);
+		for (i = 0; i < t5->size; i++)
+			cmd[i] = (t5->cmd[i * 4 + 3] << 24)
+				| (t5->cmd[i * 4 + 2] << 16)
+				| (t5->cmd[i * 4 + 1] << 8)
+				| (t5->cmd[i * 4]);
+			lcm_util->dsi_set_cmdq_V11(cmdq, cmd, (unsigned int)t5->size, force_update);
+	} else {
+		pr_debug("[LCM][ERROR] %s/%d: 0x%p, %d\n", __func__, __LINE__, t5->cmd, t5->size);
+		return LCM_STATUS_ERROR;
+	}
+
+	return LCM_STATUS_OK;
+}
+
+
 
 LCM_STATUS lcm_util_set_write_cmd_v2(const LCM_UTIL_FUNCS *lcm_util, LCM_DATA_T3 *t3,
 				     unsigned char force_update)
 {
 	/* check parameter is valid */
-	if (LCM_STATUS_OK == _lcm_util_check_write_cmd_v2(t3)) {
+	if (_lcm_util_check_write_cmd_v2(t3) == LCM_STATUS_OK) {
 		if (t3->cmd == LCM_UTIL_WRITE_CMD_V2_NULL) {
 			lcm_util->dsi_set_null((unsigned char)t3->cmd, (unsigned char)t3->size,
 					       (unsigned char *)t3->data, force_update);
@@ -171,7 +200,7 @@ LCM_STATUS lcm_util_set_write_cmd_v23(const LCM_UTIL_FUNCS *lcm_util, void *hand
 				     unsigned char force_update)
 {
 	/* check parameter is valid */
-	if (LCM_STATUS_OK == _lcm_util_check_write_cmd_v23(t3))
+	if (_lcm_util_check_write_cmd_v23(t3) == LCM_STATUS_OK)
 		lcm_util->dsi_set_cmdq_V23(handle, (unsigned char)t3->cmd, (unsigned char)t3->size,
 					  (unsigned char *)t3->data, force_update);
 	else {
@@ -195,7 +224,7 @@ LCM_STATUS lcm_util_set_read_cmd_v2(const LCM_UTIL_FUNCS *lcm_util, LCM_DATA_T4 
 	*compare = 0;
 
 	/* check parameter is valid */
-	if (LCM_STATUS_OK == _lcm_util_check_read_cmd_v2(t4)) {
+	if (_lcm_util_check_read_cmd_v2(t4) == LCM_STATUS_OK) {
 		unsigned char buffer[4];
 
 		lcm_util->dsi_dcs_read_lcm_reg_v2((unsigned char)t4->cmd, buffer, 4);

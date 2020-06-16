@@ -14,9 +14,15 @@
 #ifndef __LCM_DRV_H__
 #define __LCM_DRV_H__
 
+/* Vanzo:hanshengpeng on: Mon, 04 Dec 2017 17:41:45 +0800
+ * for build lk lcm
+ */
+#ifndef BUILD_LK
 #include <linux/device.h>
 #include <linux/platform_device.h>
 #include <linux/regulator/consumer.h>
+#endif
+// End of Vanzo:hanshengpeng
 
 #ifndef ARY_SIZE
 #define ARY_SIZE(x) (sizeof((x)) / sizeof((x[0])))
@@ -95,13 +101,12 @@ typedef enum {
 } LCM_IOCTL;
 
 /* DBI related enumerations */
-
 typedef enum {
-	LCM_DBI_CLOCK_FREQ_104M = 0,
+	LCM_DBI_CLOCK_FREQ_125M = 0,
+	LCM_DBI_CLOCK_FREQ_104M,
+	LCM_DBI_CLOCK_FREQ_78M,
 	LCM_DBI_CLOCK_FREQ_52M,
-	LCM_DBI_CLOCK_FREQ_26M,
-	LCM_DBI_CLOCK_FREQ_13M,
-	LCM_DBI_CLOCK_FREQ_7M
+	LCM_DBI_CLOCK_FREQ_26M
 } LCM_DBI_CLOCK_FREQ;
 
 
@@ -167,9 +172,9 @@ typedef enum {
 } LCM_DPI_FORMAT;
 
 typedef enum {
-	LCM_SERIAL_CLOCK_FREQ_104M = 0,
-	LCM_SERIAL_CLOCK_FREQ_26M,
-	LCM_SERIAL_CLOCK_FREQ_52M
+	LCM_SERIAL_CLOCK_FREQ_125M = 0,
+	LCM_SERIAL_CLOCK_FREQ_78M,
+	LCM_SERIAL_CLOCK_FREQ_104M
 } LCM_SERIAL_CLOCK_FREQ;
 
 typedef enum {
@@ -223,6 +228,16 @@ typedef enum {
 	LCM_PACKED_PS_24BIT_RGB888 = 2,
 	LCM_PACKED_PS_18BIT_RGB666 = 3
 } LCM_PS_TYPE;
+
+
+typedef enum {
+	LCM_Hx1_Vx1 = 0,
+	LCM_Hx1_Vx2 = 1,
+	LCM_Hx2_Vx1 = 2,
+	LCM_Hx2_Vx2 = 3
+} LCM_SCALE_TYPE;
+
+
 
 typedef enum {
 	LCM_DSI_6589_PLL_CLOCK_NULL = 0,
@@ -288,6 +303,15 @@ typedef struct {
 	LCM_DBI_DATA_WIDTH width;
 } LCM_DBI_DATA_FORMAT;
 
+typedef enum {
+	LCM_DBI_C_3WIRE = 1,
+	LCM_DBI_C_4WIRE = 2,
+} LCM_DBI_C_WIRE_NUM;
+
+typedef enum {
+	LCM_DBI_C_1DATA_PIN = 1,
+	LCM_DBI_C_2DATA_PIN = 2,
+} LCM_DBI_C_DATA_PIN_NUM;
 
 typedef struct {
 	LCM_POLARITY cs_polarity;
@@ -312,6 +336,9 @@ typedef struct {
 	unsigned int sif_div2;
 	unsigned int sif_hw_cs;
 /* ////////////////////////////////// */
+
+	LCM_DBI_C_WIRE_NUM wire_num;
+	LCM_DBI_C_DATA_PIN_NUM datapin_num;
 } LCM_DBI_SERIAL_PARAMS;
 
 
@@ -382,6 +409,7 @@ typedef struct {
 
 
 typedef struct {
+	LCM_CTRL ctrl;
 	/* common parameters for serial & parallel interface */
 	unsigned int port;
 	LCM_DBI_CLOCK_FREQ clock_freq;
@@ -406,12 +434,10 @@ typedef struct {
 
 
 typedef struct {
-	/*
-	   Pixel Clock Frequency = 26MHz * mipi_pll_clk_div1
-	   / (mipi_pll_clk_ref + 1)
-	   / (2 * mipi_pll_clk_div2)
-	   / dpi_clk_div
-	 */
+	/* Pixel Clock Frequency = 26MHz * mipi_pll_clk_div1*/
+	/*   / (mipi_pll_clk_ref + 1)*/
+	/*   / (2 * mipi_pll_clk_div2)*/
+	/*   / dpi_clk_div */
 	unsigned int mipi_pll_clk_ref;	/* 0..1 */
 	unsigned int mipi_pll_clk_div1;	/* 0..63 */
 	unsigned int mipi_pll_clk_div2;	/* 0..15 */
@@ -570,7 +596,8 @@ typedef struct {
 	unsigned int rg_bir;
 	unsigned int rg_bic;
 	unsigned int rg_bp;
-	unsigned int PLL_CLOCK;
+	unsigned int PLL_CLOCK;	/* PLL_CLOCK = (int) PLL_CLOCK */
+	unsigned int data_rate; /* data_rate = PLL_CLOCK x 2 */
 	unsigned int PLL_CK_VDO;
 	unsigned int PLL_CK_CMD;
 	unsigned int dsi_clock;
@@ -616,6 +643,12 @@ typedef struct {
 
 	unsigned int ext_te_edge;
 	unsigned int eint_disable;
+
+	unsigned int IsCphy;
+	unsigned int PHY_SEL0;
+	unsigned int PHY_SEL1;
+	unsigned int PHY_SEL2;
+	unsigned int PHY_SEL3;
 } LCM_DSI_PARAMS;
 
 /* --------------------------------------------------------------------------- */
@@ -632,6 +665,7 @@ typedef struct {
 	unsigned int height;
 	unsigned int virtual_width;
 	unsigned int virtual_height;
+	unsigned int density;
 	unsigned int io_select_mode;	/* DBI or DPI should select IO mode according to chip spec */
 
 	/* particular parameters */
@@ -644,10 +678,19 @@ typedef struct {
 	unsigned int physical_height_um;	/* length: um, for more precise precision */
 	unsigned int od_table_size;
 	void *od_table;
+	unsigned int max_refresh_rate;
+	unsigned int min_refresh_rate;
+
+#ifdef CONFIG_MTK_ROUND_CORNER_SUPPORT
+	unsigned int round_corner_en;
+	unsigned int full_content;
+	unsigned int corner_pattern_width;
+	unsigned int corner_pattern_height;
+	unsigned int corner_pattern_height_bot;
+#endif
 } LCM_PARAMS;
 
 
-#if defined(MTK_LCM_DEVICE_TREE_SUPPORT)
 #ifndef MAX
 #define MAX(x, y)   (((x) >= (y)) ? (x) : (y))
 #endif				/* MAX */
@@ -656,7 +699,7 @@ typedef struct {
 #define MIN(x, y)   (((x) <= (y)) ? (x) : (y))
 #endif				/* MIN */
 
-#define INIT_SIZE			(512)
+#define INIT_SIZE			(640)
 #define COMPARE_ID_SIZE	(32)
 #define SUSPEND_SIZE		(32)
 #define BACKLIGHT_SIZE		(32)
@@ -733,7 +776,6 @@ typedef struct {
 	LCM_DATA backlight[BACKLIGHT_SIZE];
 	LCM_DATA backlight_cmdq[BACKLIGHT_CMDQ_SIZE];
 } LCM_DTS;
-#endif
 
 
 /* --------------------------------------------------------------------------- */
@@ -752,6 +794,7 @@ typedef struct {
 	void (*set_reset_pin)(unsigned int value);
 	void (*set_chip_select)(unsigned int value);
 	int (*set_gpio_out)(unsigned int gpio, unsigned int value);
+	void (*set_te_pin)(void);
 
 	void (*udelay)(unsigned int us);
 	void (*mdelay)(unsigned int ms);
@@ -777,9 +820,8 @@ typedef struct {
 						 unsigned char buffer_size);
 	void (*wait_transfer_done)(void);
 
-	/** FIXME: GPIO mode should not be configured in lcm driver
-	       REMOVE ME after GPIO customization is done
-	*/
+	/*   FIXME: GPIO mode should not be configured in lcm driver*/
+	/*      REMOVE ME after GPIO customization is done	*/
 	int (*set_gpio_mode)(unsigned int pin, unsigned int mode);
 	int (*set_gpio_dir)(unsigned int pin, unsigned int dir);
 	int (*set_gpio_pull_enable)(unsigned int pin, unsigned char pull_en);
@@ -812,9 +854,7 @@ typedef struct {
 
 	void (*update)(unsigned int x, unsigned int y, unsigned int width, unsigned int height);
 	unsigned int (*compare_id)(void);
-#if defined(MTK_LCM_DEVICE_TREE_SUPPORT)
 	void (*parse_dts)(const LCM_DTS *DTS, unsigned char force_update);
-#endif
 
 	/* /////////////////////////CABC backlight related function */
 	void (*set_backlight)(unsigned int level);
@@ -827,6 +867,8 @@ typedef struct {
 	int (*adjust_fps)(void *cmdq, int fps, LCM_PARAMS *params);
 	void (*validate_roi)(int *x, int *y, int *width, int *height);
 
+	void (*scale)(void *handle, LCM_SCALE_TYPE scale);
+	void (*setroi)(int x, int y, int width, int height, void *handle);
 	/* ///////////ESD_RECOVERY////////////////////// */
 	unsigned int (*esd_check)(void);
 	unsigned int (*esd_recover)(void);
@@ -847,31 +889,31 @@ typedef struct {
 			     unsigned int *lcm_value);
 	/* /////////////PWM///////////////////////////// */
 	void (*set_pwm_for_mix)(int enable);
+
+	void (*aod)(int enter);
 } LCM_DRIVER;
 
 #if	defined(CONFIG_ARCH_MT6735) ||\
 	defined(CONFIG_ARCH_MT6735M) ||\
 	defined(CONFIG_ARCH_MT6753) ||\
-	defined(CONFIG_ARCH_MT6570) ||\
 	defined(CONFIG_ARCH_MT6580) ||\
-	defined(CONFIG_ARCH_MT8167)
+	defined(CONFIG_MACH_MT8167)
 extern LCM_DRIVER *lcm_driver_list[];
 extern unsigned int lcm_count;
 #endif
-/* --------------------------------------------------------------------------- */
 /* LCM Driver Functions */
 /* --------------------------------------------------------------------------- */
-extern int hct_read_adc_value(int channel,char *sign,int x,int y );
+
 const LCM_DRIVER *LCM_GetDriver(void);
 unsigned char which_lcd_module_triple(void);
 int lcm_vgp_supply_enable(void);
 int lcm_vgp_supply_disable(void);
-#define LCM_RESET_PIN_NO        0
-#define LCM_POWER_DP_NO         1
-#define LCM_POWER_DM_NO         2
-#define LCM_POWER_ENN         3
-#define LCM_POWER_ENP         4
-extern int mt_dsi_pinctrl_set(unsigned int pin , unsigned int level);
 extern LCM_DSI_MODE_CON lcm_dsi_mode;
+
+extern int display_bias_enable(void);
+extern int display_bias_disable(void);
+extern int display_bias_regulator_init(void);
+
+
 
 #endif /* __LCM_DRV_H__ */

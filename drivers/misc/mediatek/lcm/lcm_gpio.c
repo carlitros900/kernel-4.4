@@ -135,9 +135,9 @@ static int _lcm_gpio_probe(struct platform_device *pdev)
 	}
 	for (mode = LCM_GPIO_MODE_00; mode < MAX_LCM_GPIO_MODE; mode++) {
 		_lcm_gpio_mode[mode] = pinctrl_lookup_state(_lcm_gpio, _lcm_gpio_mode_list[mode]);
-		if (IS_ERR(_lcm_gpio_mode[mode])) {
+		if (IS_ERR(_lcm_gpio_mode[mode]))
 			pr_err("[LCM][ERROR] Cannot find lcm_mode:%d! skip it.\n", mode);
-		}
+
 	}
 
 	if (dev->of_node) {
@@ -253,7 +253,7 @@ static LCM_STATUS _lcm_gpio_check_data(char type, const LCM_DATA_T1 *t1)
 LCM_STATUS lcm_gpio_set_data(char type, const LCM_DATA_T1 *t1)
 {
 	/* check parameter is valid */
-	if (LCM_STATUS_OK == _lcm_gpio_check_data(type, t1)) {
+	if (_lcm_gpio_check_data(type, t1) == LCM_STATUS_OK) {
 		switch (type) {
 #ifdef CONFIG_MTK_LEGACY
 		case LCM_GPIO_MODE:

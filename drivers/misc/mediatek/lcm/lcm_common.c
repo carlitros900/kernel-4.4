@@ -875,6 +875,66 @@ void lcm_common_resume(void)
 	lcm_common_init();
 }
 
+void lcm_common_updatebycmdq(unsigned int x, unsigned int y
+		, unsigned int width, unsigned int height, void *cmdq)
+{
+	unsigned int x0 = x;
+	unsigned int y0 = y;
+	unsigned int x1 = x0 + width - 1;
+	unsigned int y1 = y0 + height - 1;
+
+	unsigned char x0_MSB = ((x0 >> 8) & 0xFF);
+	unsigned char x0_LSB = (x0 & 0xFF);
+	unsigned char x1_MSB = ((x1 >> 8) & 0xFF);
+	unsigned char x1_LSB = (x1 & 0xFF);
+	unsigned char y0_MSB = ((y0 >> 8) & 0xFF);
+	unsigned char y0_LSB = (y0 & 0xFF);
+	unsigned char y1_MSB = ((y1 >> 8) & 0xFF);
+	unsigned char y1_LSB = (y1 & 0xFF);
+
+	LCM_DATA update;
+	LCM_DATA_T5 *data_t5 = &(update.data_t5);
+	LCM_PARAMS *dts_params = &_LCM_DTS.params;
+
+	if (_LCM_DTS.parsing != 0) {
+		if (dts_params->dsi.mode == CMD_MODE) {
+			data_t5->size = 3;
+			data_t5->cmd[0] = 0x02;
+			data_t5->cmd[1] = 0x39;
+			data_t5->cmd[2] = 0x05;
+			data_t5->cmd[3] = 0x00;
+
+			data_t5->cmd[4] = 0x2a;
+			data_t5->cmd[5] = x0_MSB;
+			data_t5->cmd[6] = x0_LSB;
+			data_t5->cmd[7] = x1_MSB;
+
+			data_t5->cmd[8] = x1_LSB;
+			data_t5->cmd[9] = 0x00;
+			data_t5->cmd[10] = 0x00;
+			data_t5->cmd[11] = 0x00;
+			lcm_util_set_write_cmd_v11(&lcm_util, data_t5, 1, cmdq);
+
+			data_t5->size = 3;
+			data_t5->cmd[0] = 0x02;
+			data_t5->cmd[1] = 0x39;
+			data_t5->cmd[2] = 0x05;
+			data_t5->cmd[3] = 0x00;
+
+			data_t5->cmd[4] = 0x2b;
+			data_t5->cmd[5] = y0_MSB;
+			data_t5->cmd[6] = y0_LSB;
+			data_t5->cmd[7] = y1_MSB;
+
+			data_t5->cmd[8] = y1_LSB;
+			data_t5->cmd[9] = 0x00;
+			data_t5->cmd[10] = 0x00;
+			data_t5->cmd[11] = 0x00;
+			lcm_util_set_write_cmd_v11(&lcm_util, data_t5, 1, cmdq);
+		}
+	}
+}
+
 
 void lcm_common_update(unsigned int x, unsigned int y, unsigned int width, unsigned int height)
 {
@@ -1161,6 +1221,104 @@ void lcm_common_setbacklight_cmdq(void *handle, unsigned int level)
 }
 
 #if defined(R63419_WQHD_TRULY_PHANTOM_2K_CMD_OK)
+void lcm_common_setroi(int x, int y, int width, int height, void *handle)
+{
+	lcm_common_updatebycmdq(2*x, 2*y, 2*width, 2*height, handle);
+}
+
+
+void lcm_common_scale(void *handle, LCM_SCALE_TYPE scale)
+{
+	LCM_DATA_T3 cmd;
+
+	if (scale == LCM_Hx2_Vx2)
+		lcm_common_updatebycmdq(0, 0, 1440, 2560, handle);
+	else if (scale == LCM_Hx1_Vx1)
+		lcm_common_updatebycmdq(0, 0, 720, 1280, handle);
+
+	if (scale == LCM_Hx2_Vx2) {
+
+		cmd.cmd = 0xB0;
+		cmd.size = 1;
+		cmd.data[0] = 0x00;
+		lcm_util_set_write_cmd_v23(&lcm_util, handle,
+			&cmd, 1);
+
+
+		cmd.cmd = 0xB6;
+		cmd.size = 2;
+		cmd.data[0] = 0x39;
+		cmd.data[1] = 0x93;
+		lcm_util_set_write_cmd_v23(&lcm_util, handle,
+			&cmd, 1);
+
+
+		cmd.cmd = 0xC5;
+		cmd.size = 1;
+		cmd.data[0] = 0x03;
+		lcm_util_set_write_cmd_v23(&lcm_util, handle,
+			&cmd, 1);
+
+		cmd.cmd = 0xB0;
+		cmd.size = 1;
+		cmd.data[0] = 0x03;
+		lcm_util_set_write_cmd_v23(&lcm_util, handle,
+			&cmd, 1);
+
+
+	} else if (scale == LCM_Hx1_Vx1) {
+
+		cmd.cmd = 0x10;
+		cmd.size = 0;
+		lcm_util_set_write_cmd_v23(&lcm_util, handle,
+			&cmd, 1);
+
+
+		cmd.cmd = 0x11;
+		cmd.size = 0;
+		lcm_util_set_write_cmd_v23(&lcm_util, handle,
+			&cmd, 1);
+
+
+		cmd.cmd = 0xB0;
+		cmd.size = 1;
+		cmd.data[0] = 0x00;
+		lcm_util_set_write_cmd_v23(&lcm_util, handle,
+			&cmd, 1);
+
+
+		cmd.cmd = 0xB6;
+		cmd.size = 2;
+		cmd.data[0] = 0x3A;
+		cmd.data[1] = 0xD3;
+		lcm_util_set_write_cmd_v23(&lcm_util, handle,
+			&cmd, 1);
+
+
+		cmd.cmd = 0xC5;
+		cmd.size = 1;
+		cmd.data[0] = 0x00;
+		lcm_util_set_write_cmd_v23(&lcm_util, handle,
+			&cmd, 1);
+
+		cmd.cmd = 0xB0;
+		cmd.size = 1;
+		cmd.data[0] = 0x03;
+		lcm_util_set_write_cmd_v23(&lcm_util, handle,
+			&cmd, 1);
+
+	}
+
+}
+
+
+
+
+
+
+
+
+
 #define PARTIAL_WIDTH_ALIGN_LINE
 static inline int align_to(int value, int n, int lower_align)
 {
@@ -1169,6 +1327,7 @@ static inline int align_to(int value, int n, int lower_align)
 	value = (((x) + ((n) - 1)) & ~((n) - 1));
 
 	if (lower_align) {
+
 		if (value > x)
 			value -= n;
 	} else {
@@ -1250,10 +1409,8 @@ static void r63419_lcm_validate_roi(int *x, int *y, int *width, int *height)
 		}
 		h = y2 - y1 + 1;
 	}
-	/*
-	   LCD_DEBUG("roi(%d,%d,%d,%d) to (%d,%d,%d,%d)\n",
-	 *x, *y, *width, *height, x1, y1, w, h);
-	 */
+	/* LCD_DEBUG("roi(%d,%d,%d,%d) to (%d,%d,%d,%d)\n",*/
+	/* *x, *y, *width, *height, x1, y1, w, h);	 */
 	*x = x1;
 	*y = y1;
 	*width = w;
@@ -1276,6 +1433,8 @@ LCM_DRIVER lcm_common_drv = {
 	.parse_dts = lcm_common_parse_dts,
 #if defined(R63419_WQHD_TRULY_PHANTOM_2K_CMD_OK)
 	.validate_roi = r63419_lcm_validate_roi,
+	.scale = lcm_common_scale,
+	.setroi = lcm_common_setroi,
 #endif
 };
 #endif
