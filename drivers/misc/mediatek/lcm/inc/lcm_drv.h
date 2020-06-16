@@ -908,6 +908,13 @@ const LCM_DRIVER *LCM_GetDriver(void);
 unsigned char which_lcd_module_triple(void);
 int lcm_vgp_supply_enable(void);
 int lcm_vgp_supply_disable(void);
+#define LCM_RESET_PIN_NO        0
+#define LCM_POWER_DP_NO         1
+#define LCM_POWER_DM_NO         2
+#define LCM_POWER_ENN         3
+#define LCM_POWER_ENP         4
+extern int mt_dsi_pinctrl_set(unsigned int pin , unsigned int level);
+
 extern LCM_DSI_MODE_CON lcm_dsi_mode;
 
 extern int display_bias_enable(void);
