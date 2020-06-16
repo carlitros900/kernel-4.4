@@ -16,6 +16,40 @@
 
 #include <lcm_drv.h>
 
+extern LCM_DRIVER hct_nt35521_dsi_vdo_hd_cmi_55_rx;
+extern LCM_DRIVER hct_rm68200_dsi_vdo_hd_auo_50_ykl;
+extern LCM_DRIVER hct_rm67120_dsi_vdo_hd_gvo_55_gx;
+extern LCM_DRIVER hct_r69339_dsi_vdo_hd_sharp_55_ln;
+extern LCM_DRIVER hct_nt35521_dsi_vdo_hd_auo_50_rx;
+extern LCM_DRIVER hct_otm1282a_dsi_vdo_hd_auo;
+extern LCM_DRIVER hct_rm68200_dsi_vdo_hd_auo;
+extern LCM_DRIVER hct_otm1901_dsi_vdo_fhd_auo;
+extern LCM_DRIVER hct_nt35596_dsi_vdo_fhd_auo;
+extern LCM_DRIVER hct_rm68200_dsi_vdo_hd_tm_50_ll;
+extern LCM_DRIVER hct_rm67120_dsi_vdo_hd_auo_55_gx;
+extern LCM_DRIVER hct_nt35532_dsi_vdo_fhd_auo_ips_55_xl;
+extern LCM_DRIVER hct_nt35532_dsi_vdo_fhd_auo_55_ykl;
+extern LCM_DRIVER hct_nt35532_dsi_vdo_fhd_auo_55_rx;
+extern LCM_DRIVER hct_sh1386_dsi_vdo_hd_hx_55_hx;
+extern LCM_DRIVER hct_r63350a_dsi_vdo_fhd_auo_55_hz;
+extern LCM_DRIVER hct_nt35532_dsi_vdo_fhd_sharp_50_sh;
+extern LCM_DRIVER hct_nt35596_dsi_vdo_fhd_auo_60_rx;
+extern LCM_DRIVER hct_r63350_dsi_vdo_hd_auo_55_rx;
+extern LCM_DRIVER hct_nt35532_dsi_vdo_fhd_panda_55_sh;
+extern LCM_DRIVER hct_ili9885a_dsi_vdo_fhd_auo_55_wcl;
+extern LCM_DRIVER hct_nt35532_dsi_vdo_fhd_panda_55_gvo;
+extern LCM_DRIVER hct_nt35532_dsi_vdo_fhd_panda_55_zgd;
+extern LCM_DRIVER hct_otm1901a_dsi_vdo_fhd_auo_55_hs;
+extern LCM_DRIVER hct_ili7807d_dsi_vdo_fhd_innolcex_50_xzx;
+extern LCM_DRIVER hct_rm69071_dsi_vdo_fhd_auo_oled_55_jf;
+extern LCM_DRIVER hct_nt35532_dsi_vdo_fhd_panda_55_hz;
+extern LCM_DRIVER hct_ili9881c_dsi_vdo_hd_auo_55_xzx;
+extern LCM_DRIVER hct_rm68200_dsi_vdo_hd_jdf_55_xld;
+extern LCM_DRIVER hct_nt35532_dsi_vdo_fhd_sharp_55_dt;
+extern LCM_DRIVER hct_ili9885a_dsi_vdo_fhd_auo_55_ykl;
+extern LCM_DRIVER hct_hx8394d_dsi_vdo_hd_cmi_55_blj;
+extern LCM_DRIVER hct_ili9881c_dsi_vdo_hd_hsd_60_hx;
+
 extern LCM_DRIVER ft8006u_auo60_haifei_lhd_lcm_drv;
 extern LCM_DRIVER otm1282a_hd720_dsi_vdo_60hz_lcm_drv;
 extern LCM_DRIVER otm1282a_hd720_dsi_vdo_lcm_drv;
