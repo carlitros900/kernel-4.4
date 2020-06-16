@@ -108,7 +108,7 @@ enum { /* charge status */
  */
 extern bool mtk_is_pd_chg_ready(void);
 extern int tcpm_hard_reset(void *ptr);
-extern int tcpm_set_direct_charge_en(void *ptr, bool en);
+extern int tcpm_set_direct_charge_en(struct tcpc_device *tcpc, bool en);
 extern int tcpm_get_cable_capability(void *ptr, unsigned char *capability);
 extern bool mtk_is_pep30_en_unlock(void);
 
