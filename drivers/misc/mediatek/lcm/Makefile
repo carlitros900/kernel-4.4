@@ -14,21 +14,9 @@
 #
 # Makefile for misc devices that really don't fit anywhere else.
 #
-# Vanzo:yucheng on: Fri, 14 Oct 2016 18:32:37 +0800
-# added for aosp management to import our variable
-project_name:=$(shell echo $(VANZO_INNER_PROJECT_NAME))
-ifneq ($(strip $(project_name)),)
--include $(srctree)/../zprojects/$(project_name)/$(project_name).mk
-ccflags-y += -I$(VANZO_PROJECT_HEADERS)
-
-# here use the CUSTOM_LK_LCM to prio the CUSTOM_LK_LCM when zprojects is open
-ifneq ($(strip $(CUSTOM_KERNEL_LCM)),)
-CONFIG_CUSTOM_KERNEL_LCM = $(CUSTOM_KERNEL_LCM)
-endif
-endif
-# End of Vanzo: yucheng
 
 obj-$(CONFIG_MTK_LCM) += mt65xx_lcm_list.o        \
+			 lcm_dispsys_gpio.o	  \
                          lcm_common.o             \
                          lcm_gpio.o               \
                          lcm_i2c.o                \
@@ -42,6 +30,8 @@ subdir-ccflags-$(CONFIG_MTK_LCM) += -I$(srctree)/drivers/misc/mediatek/lcm/inc
 subdir-ccflags-$(CONFIG_MTK_FB) += -I$(srctree)/drivers/misc/mediatek/video/$(MTK_PLATFORM)/dispsys \
                                        -I$(srctree)/drivers/misc/mediatek/video/$(MTK_PLATFORM)/dispsys/mt6735 \
                                        -I$(srctree)/drivers/misc/mediatek/video/$(MTK_PLATFORM)/videox \
+                                       -I$(srctree)/drivers/misc/mediatek/video/$(MTK_PLATFORM)/ \
+                                       -I$(srctree)/drivers/misc/mediatek/video/$(MTK_PLATFORM)/mt6735/ \
                                        -I$(srctree)/drivers/misc/mediatek/video/include
 
 LCM_DEFINES := $(shell echo $(CONFIG_CUSTOM_KERNEL_LCM) | tr a-z A-Z)
