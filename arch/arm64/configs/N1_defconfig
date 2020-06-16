@@ -553,7 +553,7 @@ CONFIG_CRYPTO_AES_ARM64_CE_BLK=y
 ###########################################################################
 
 CONFIG_MTK_LCM=y
-CONFIG_CUSTOM_KERNEL_LCM="td4310_fhd_dsi_vdo_chuangwei_malata"
+CONFIG_CUSTOM_KERNEL_LCM="hct_rm67120_dsi_vdo_hd_auo_55_gx"
 CONFIG_LCM_HEIGHT="1920"
 CONFIG_LCM_WIDTH="1080"
 
